@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My AI — Your Creative Companion</title>
+
+<style>
+:root {
+  --bg: #101014;
+  --panel: #17171e;
+  --card: #1c1b24;
+  --text: #f7f3fb;
+  --muted: #a09aaf;
+  --border: rgba(255,255,255,.09);
+  --pink: #e879c7;
+  --purple: #a78bfa;
+  --shadow: 0 15px 45px rgba(0,0,0,.18);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Inter, Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 60% 15%, rgba(137,79,177,.16), transparent 42%),
+    radial-gradient(ellipse at 90% 75%, rgba(213,91,165,.07), transparent 35%),
+    var(--bg);
+  min-height: 100vh;
+  transition: background .25s, color .25s;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 3px;
+}
+
+body.light {
+  --bg: #f8f6fc;
+  --panel: #ffffff;
+  --card: #ffffff;
+  --text: #292238;
+  --muted: #898197;
+  --border: rgba(50,30,70,.10);
+  --shadow: 0 15px 45px rgba(65,35,85,.07);
+  background:
+    radial-gradient(ellipse at 65% 0%, rgba(227,177,228,.22), transparent 40%),
+    #f8f6fc;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 258px;
+  flex-shrink: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 17px 18px;
+  background: rgba(19,19,25,.95);
+  border-right: 1px solid var(--border);
+  transition: transform .25s, background .25s;
+}
+
+body.light .sidebar {
+  background: rgba(255,255,255,.92);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 33px;
+  padding-left: 3px;
+}
+
+.logo {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: white;
+  font-size: 24px;
+  background: linear-gradient(135deg, #e879c7, #8b75ed);
+  box-shadow: 0 5px 25px rgba(181,104,225,.23);
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.7px;
+}
+
+.brand small {
+  display: block;
+  margin-top: 4px;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1.25px;
+}
+
+.new-chat {
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  background: linear-gradient(110deg, #ce68b6, #8b73e8);
+  box-shadow: 0 5px 22px rgba(170,94,202,.16);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.new-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 28px rgba(170,94,202,.28);
+}
+
+.section-title {
+  margin: 30px 8px 13px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.history {
+  display: grid;
+  gap: 5px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.history button, .side-button {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: .2s;
+}
+
+.history button:hover,
+.history button.active,
+.side-button:hover {
+  color: var(--text);
+  background: rgba(177,126,230,.10);
+}
+
+.history button.active {
+  border-color: rgba(195,145,242,.15);
+}
+
+.empty-note {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 10px;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 18px;
+  padding: 18px 5px 0;
+  border-top: 1px solid var(--border);
+}
+
+.avatar {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 13px;
+  color: white;
+  font-weight: 750;
+  background: linear-gradient(135deg,#59416f,#a47ed0);
+}
+
+.profile-name {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.profile small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* MAIN */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 68px;
+  flex-shrink: 0;
+  padding: 0 29px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(17,17,22,.78);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+}
+
+body.light .topbar {
+  background: rgba(255,255,255,.8);
+}
+
+.topbar-title {
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.online {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #49d3a1;
+  box-shadow: 0 0 10px rgba(73,211,161,.35);
+}
+
+.top-actions {
+  display: flex;
+  gap: 9px;
+  margin-left: auto;
+}
+
+.top-actions button {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--text);
+  background: rgba(255,255,255,.025);
+  transition: .2s;
+}
+
+.top-actions button:hover {
+  background: rgba(172,123,231,.12);
+  border-color: rgba(192,143,240,.4);
+  transform: translateY(-1px);
+}
+
+.menu-toggle {
+  display: none !important;
+}
+
+/* CONTENT */
+
+.content {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 32px 160px;
+  flex: 1;
+}
+
+.hero {
+  text-align: center;
+  padding: 40px 0 38px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border: 1px solid rgba(211,154,241,.25);
+  border-radius: 40px;
+  background: rgba(183,125,222,.07);
+  color: #e5b6f5;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.15px;
+}
+
+body.light .badge {
+  color: #9850a9;
+  background: #f9eafa;
+}
+
+.hero h1 {
+  margin: 27px 0 17px;
+  font-size: clamp(35px,4.2vw,52px);
+  line-height: 1.17;
+  font-weight: 780;
+  letter-spacing: -2px;
+}
+
+.gradient-text {
+  background: linear-gradient(100deg,#f0a5d9 5%,#c8a6ff 55%,#a8b8ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  max-width: 450px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+/* SUGGESTION CARDS */
+
+.prompt-cards {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 15px;
+  max-width: 760px;
+  margin: 37px auto 0;
+}
+
+.prompt-card {
+  min-height: 145px;
+  padding: 19px;
+  display: block;
+  text-align: left;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  box-shadow: 0 8px 30px rgba(0,0,0,.06);
+  transition: transform .25s,border-color .25s,background .25s,box-shadow .25s;
+}
+
+body.light .prompt-card {
+  background: rgba(255,255,255,.8);
+}
+
+.prompt-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(195,145,242,.42);
+  background: linear-gradient(145deg,rgba(175,122,223,.11),rgba(255,255,255,.025));
+  box-shadow: var(--shadow);
+}
+
+.prompt-icon {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 17px;
+  border-radius: 12px;
+  background: rgba(239,177,226,.13);
+  font-size: 18px;
+}
+
+.prompt-card:nth-child(2) .prompt-icon {
+  background: rgba(172,148,255,.14);
+}
+
+.prompt-card:nth-child(3) .prompt-icon {
+  background: rgba(119,220,183,.12);
+}
+
+.prompt-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.prompt-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* MESSAGES */
+
+.messages {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.message {
+  display: flex;
+  gap: 14px;
+  margin: 29px 0;
+  animation: appear .25s ease;
+}
+
+.message.user {
+  margin-left: 35px;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: white;
+  background: #352a43;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message-avatar.ai {
+  background: linear-gradient(135deg,#dc76c3,#9379ef);
+  box-shadow: 0 4px 15px rgba(187,104,212,.15);
+}
+
+.message-body {
+  min-width: 0;
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.message-name {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message-name small {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.message-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message-tools {
+  margin-top: 8px;
+}
+
+.message-tools button {
+  padding: 5px 8px;
+  margin-right: 3px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+}
+
+.message-tools button:hover {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+.typing {
+  color: var(--muted);
+  font-size: 12px;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: .45; }
+  to { opacity: 1; }
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* COMPOSER */
+
+.composer-wrap {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 18px 24px 15px;
+  background: linear-gradient(transparent,var(--bg) 26%);
+}
+
+.composer {
+  max-width: 770px;
+  margin: 0 auto;
+  padding: 11px 13px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 19px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  transition: border-color .2s,box-shadow .2s;
+}
+
+.composer:focus-within {
+  border-color: rgba(195,145,242,.48);
+  box-shadow: 0 0 0 4px rgba(170,123,229,.06);
+}
+
+.composer textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 130px;
+  resize: none;
+  padding: 8px 0;
+  border: none;
+  outline: none;
+  color: var(--text);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.composer textarea::placeholder {
+  color: var(--muted);
+}
+
+.composer button {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 11px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 18px;
+  transition: .2s;
+}
+
+.composer button:hover {
+  color: var(--pink);
+  background: rgba(172,123,231,.12);
+}
+
+.composer .send {
+  color: white;
+  background: linear-gradient(135deg,#dc76c3,#9379ef);
+  box-shadow: 0 4px 15px rgba(169,108,219,.2);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.composer .send:hover {
+  color: white;
+  transform: translateY(-2px);
+}
+
+.disclaimer {
+  margin-top: 11px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 10px;
+}
+
+/* SCROLLBAR */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #51435e transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #51435e;
+  border-radius: 10px;
+}
+
+::selection {
+  background: rgba(191,133,238,.35);
+}
+
+/* RESPONSIVE DESIGN */
+
+@media(max-width:850px) {
+  .sidebar {
+    width: 230px;
+  }
+
+  .content {
+    padding: 20px 20px 150px;
+  }
+
+  .topbar {
+    padding: 0 20px;
+  }
+
+  .prompt-cards {
+    gap: 10px;
+  }
+
+  .prompt-card {
+    padding: 15px;
+  }
+}
+
+@media(max-width:650px) {
+  .sidebar {
+    position: fixed;
+    z-index: 20;
+    inset: 0 auto 0 0;
+    width: 275px;
+    transform: translateX(-105%);
+    box-shadow: 12px 0 40px rgba(0,0,0,.25);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .menu-toggle {
+    display: grid !important;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    background: var(--panel);
+  }
+
+  .topbar {
+    height: 62px;
+    padding: 0 13px;
+  }
+
+  .top-actions {
+    gap: 5px;
+  }
+
+  .top-actions button {
+    width: 33px;
+    height: 33px;
+  }
+
+  .content {
+    padding: 12px 15px 145px;
+  }
+
+  .hero {
+    padding: 31px 0 25px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+    letter-spacing: -1.3px;
+  }
+
+  .hero p {
+    font-size: 12px;
+  }
+
+  .prompt-cards {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    margin-top: 27px;
+  }
+
+  .prompt-card {
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  .prompt-icon {
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .message.user {
+    margin-left: 8px;
+  }
+
+  .composer-wrap {
+    padding: 10px 10px 12px;
+  }
+}
+
+@media(max-width:360px) {
+  .hero h1 {
+    font-size: 29px;
+  }
+
+  .badge {
+    font-size: 8px;
+  }
+
+  .top-actions button {
+    width: 30px;
+    height: 30px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">✦</div>
+      <div class="brand-name">
+        My AI
+        <small>YOUR CREATIVE COMPANION</small>
+      </div>
+    </div>
+
+    <button class="new-chat" id="newChat">＋ &nbsp; New conversation</button>
+
+    <div class="section-title">Recent conversations</div>
+    <nav class="history" id="history"></nav>
+
+    <div class="sidebar-bottom">
+      <button class="side-button" id="settingsBtn">⚙ &nbsp; Settings</button>
+      <button class="side-button" id="helpBtn">ⓘ &nbsp; Help & feedback</button>
+
+      <div class="profile">
+        <div class="avatar" id="avatar">S</div>
+        <div>
+          <div class="profile-name" id="profileName">Student</div>
+          <small>Free plan · Ready to learn</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar">☰</button>
+      <div class="topbar-title">My AI</div>
+      <span class="online"></span>
+
+      <div class="top-actions">
+        <button id="topNew" title="New conversation" aria-label="New conversation">＋</button>
+        <button id="themeToggle" title="Switch theme" aria-label="Switch theme">☀</button>
+        <button id="exportBtn" title="Export conversation" aria-label="Export conversation">⇩</button>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="hero" id="welcome">
+        <span class="badge">✦ &nbsp; YOUR AI, YOUR POSSIBILITIES</span>
+
+        <h1>
+          Ideas start here.<br>
+          <span class="gradient-text">Let's create something.</span>
+        </h1>
+
+        <p>
+          Your thoughtful AI companion for learning, building, and
+          exploring what's possible. What's on your mind today?
+        </p>
+
+        <div class="prompt-cards">
+          <button class="prompt-card" data-prompt="Explain HTML in simple words">
+            <span class="prompt-icon">💡</span>
+            <span>
+              <strong>Learn something</strong>
+              <small>Make a complex topic simple</small>
+            </span>
+          </button>
+
+          <button class="prompt-card" data-prompt="Give me a beginner coding exercise">
+            <span class="prompt-icon">⌘</span>
+            <span>
+              <strong>Write some code</strong>
+              <small>Turn ideas into something real</small>
+            </span>
+          </button>
+
+          <button class="prompt-card" data-prompt="Help me plan a website">
+            <span class="prompt-icon">✧</span>
+            <span>
+              <strong>Explore an idea</strong>
+              <small>Brainstorm your next big thing</small>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+    </section>
+
+    <div class="composer-wrap">
+      <form class="composer" id="chatForm">
+        <button type="button" id="attachBtn" title="Choose a file" aria-label="Choose a file">＋</button>
+
+        <textarea
+          id="prompt"
+          rows="1"
+          placeholder="Message My AI..."
+          aria-label="Message My AI"
+        ></textarea>
+
+        <button type="button" id="voiceBtn" title="Voice input" aria-label="Voice input">♬</button>
+        <button type="submit" class="send" title="Send message" aria-label="Send message">↑</button>
+      </form>
+
+      <input type="file" id="fileInput" hidden>
+
+      <p class="disclaimer">My AI can make mistakes. Check important information.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const $ = selector => document.querySelector(selector);
+
+let conversations = [];
+let currentId = null;
+let userName = "Student";
+let enterToSend = true;
+let isDark = true;
+
+/* Create a conversation */
+function newChat() {
+  const chat = {
+    id: Date.now().toString() + Math.random().toString(16).slice(2),
+    title: "New conversation",
+    messages: []
+  };
+
+  conversations.unshift(chat);
+  currentId = chat.id;
+
+  $("#messages").innerHTML = "";
+  $("#welcome").style.display = "";
+  $("#prompt").value = "";
+  $("#prompt").style.height = "auto";
+
+  renderHistory();
+  $("#sidebar").classList.remove("open");
+  $("#prompt").focus();
+}
+
+function currentChat() {
+  return conversations.find(chat => chat.id === currentId);
+}
+
+/* History */
+function renderHistory() {
+  const history = $("#history");
+  history.innerHTML = "";
+
+  if (!conversations.length) {
+    const note = document.createElement("div");
+    note.className = "empty-note";
+    note.textContent = "Your chats will appear here";
+    history.appendChild(note);
+    return;
+  }
+
+  conversations.forEach(chat => {
+    const button = document.createElement("button");
+    button.textContent = "◈  " + chat.title;
+    button.className = currentId === chat.id ? "active" : "";
+    button.title = chat.title;
+
+    button.addEventListener("click", () => openChat(chat.id));
+    history.appendChild(button);
+  });
+}
+
+/* Open a saved conversation in this page session */
+function openChat(id) {
+  currentId = id;
+  const chat = currentChat();
+
+  if (!chat) return;
+
+  $("#messages").innerHTML = "";
+  $("#welcome").style.display = chat.messages.length ? "none" : "";
+
+  chat.messages.forEach(message => {
+    renderMessage(message.text, message.sender, false);
+  });
+
+  renderHistory();
+  $("#sidebar").classList.remove("open");
+}
+
+/* Create messages safely */
+function renderMessage(text, sender, scroll = true) {
+  const message = document.createElement("article");
+  message.className = "message " + sender;
+
+  const avatar = document.createElement("div");
+  avatar.className = "message-avatar" + (sender === "ai" ? " ai" : "");
+  avatar.textContent = sender === "ai"
+    ? "✦"
+    : userName.charAt(0).toUpperCase();
+
+  const body = document.createElement("div");
+  body.className = "message-body";
+
+  const name = document.createElement("div");
+  name.className = "message-name";
+  name.textContent = sender === "ai" ? "My AI" : userName;
+
+  const timestamp = document.createElement("small");
+  timestamp.textContent = "just now";
+  name.appendChild(timestamp);
+
+  const content = document.createElement("div");
+  content.className = "message-text";
+  content.textContent = text;
+  body.append(name, content);
+
+  if (sender === "ai") {
+    const tools = document.createElement("div");
+    tools.className = "message-tools";
+
+    const copy = document.createElement("button");
+    copy.textContent = "▢ Copy";
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        copy.textContent = "✓ Copied";
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        const success = document.execCommand("copy");
+        area.remove();
+        copy.textContent = success ? "✓ Copied" : "Copy unavailable";
+      }
+    });
+
+    const helpful = document.createElement("button");
+    helpful.textContent = "♡ Helpful";
+    helpful.addEventListener("click", () => {
+      helpful.textContent = "♥ Thanks!";
+    });
+
+    tools.append(copy, helpful);
+    body.appendChild(tools);
+  }
+
+  message.append(avatar, body);
+  $("#messages").appendChild(message);
+
+  if (scroll) {
+    message.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
+}
+
+/* Demo responses — replace with a backend API for real AI */
+function getReply(text) {
+  const query = text.toLowerCase();
+
+  if (/^(hi|hello|hey)\b/.test(query)) {
+    return "Hey there! ✨ Welcome to My AI. What would you like to learn, build, or explore today?";
+  }
+
+  if (query.includes("html")) {
+    return "HTML stands for HyperText Markup Language. It creates the structure of a webpage using headings, paragraphs, images, links, buttons, and forms. CSS makes it beautiful, while JavaScript adds interactivity.";
+  }
+
+  if (query.includes("css")) {
+    return "CSS styles your webpage. It controls colors, fonts, spacing, layout, animations, and responsive design. Start with selectors, the box model, Flexbox, Grid, and media queries.";
+  }
+
+  if (query.includes("javascript")) {
+    return "JavaScript makes websites interactive. It handles button clicks, form validation, dynamic content, and API requests. Start with variables, conditions, loops, functions, arrays, and DOM manipulation.";
+  }
+
+  if (query.includes("website")) {
+    return "Let's plan your website! 1. Define its purpose. 2. Build the structure with HTML. 3. Style it with CSS. 4. Add interactive features with JavaScript. 5. Test it on mobile and desktop. 6. Deploy it online.";
+  }
+
+  if (query.includes("code") || query.includes("programming")) {
+    return "Let's build something step by step! First, define the problem. Then break it into smaller tasks, write the code, and test different inputs. Tell me your programming language and the problem you want to solve.";
+  }
+
+  if (query.includes("help")) {
+    return "Of course! You can ask me about coding, study topics, website design, project planning, or brainstorming. Tell me what you need help with, and we'll work through it step by step.";
+  }
+
+  return "That's an interesting question! ✨ Try breaking it into smaller steps and starting with a simple example. This demo uses predefined sample responses, so connect a backend AI service for genuine AI-generated answers.";
+}
+
+/* Send a message */
+function sendMessage(text) {
+  text = text.trim();
+  if (!text) return;
+
+  if (!currentId) {
+    const chat = {
+      id: Date.now().toString(),
+      title: "New conversation",
+      messages: []
+    };
+    conversations.unshift(chat);
+    currentId = chat.id;
+  }
+
+  const chat = currentChat();
+  if (!chat) return;
+
+  $("#welcome").style.display = "none";
+
+  chat.messages.push({ text, sender: "user" });
+
+  if (chat.title === "New conversation") {
+    chat.title = text.length > 29 ? text.slice(0, 29) + "…" : text;
+  }
+
+  renderMessage(text, "user");
+  renderHistory();
+
+  $("#prompt").value = "";
+  $("#prompt").style.height = "auto";
+
+  const typingMessage = document.createElement("div");
+  typingMessage.className = "message";
+  typingMessage.id = "typingMessage";
+
+  const typingBody = document.createElement("div");
+  typingBody.className = "typing";
+  typingBody.textContent = "My AI is thinking…";
+  typingMessage.appendChild(typingBody);
+  $("#messages").appendChild(typingMessage);
+
+  const reply = getReply(text);
+
+  setTimeout(() => {
+    const typing = $("#typingMessage");
+    if (typing) typing.remove();
+
+    if (currentId !== chat.id) return;
+
+    chat.messages.push({ text: reply, sender: "ai" });
+    renderMessage(reply, "ai");
+  }, 600);
+}
+
+/* Input handling */
+$("#chatForm").addEventListener("submit", event => {
+  event.preventDefault();
+  sendMessage($("#prompt").value);
+});
+
+$("#prompt").addEventListener("input", function() {
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 130) + "px";
+});
+
+$("#prompt").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey && enterToSend) {
+    event.preventDefault();
+    $("#chatForm").requestSubmit();
+  }
+});
+
+document.querySelectorAll("[data-prompt]").forEach(button => {
+  button.addEventListener("click", () => {
+    sendMessage(button.dataset.prompt);
+  });
+});
+
+/* New chat and mobile navigation */
+$("#newChat").addEventListener("click", newChat);
+$("#topNew").addEventListener("click", newChat);
+
+$("#menuToggle").addEventListener("click", () => {
+  $("#sidebar").classList.toggle("open");
+});
+
+document.addEventListener("click", event => {
+  if (window.innerWidth <= 650 &&
+      $("#sidebar").classList.contains("open") &&
+      !$("#sidebar").contains(event.target) &&
+      !$("#menuToggle").contains(event.target)) {
+    $("#sidebar").classList.remove("open");
+  }
+});
+
+/* Theme switch */
+$("#themeToggle").addEventListener("click", () => {
+  isDark = !isDark;
+  document.body.classList.toggle("light", !isDark);
+  $("#themeToggle").textContent = isDark ? "☀" : "☾";
+  $("#themeToggle").title = isDark ? "Switch to light mode" : "Switch to dark mode";
+});
+
+/* Settings */
+$("#settingsBtn").addEventListener("click", () => {
+  const choice = prompt(
+    "SETTINGS\n\nEnter your display name to update your profile:",
+    userName
+  );
+
+  if (choice !== null && choice.trim()) {
+    userName = choice.trim();
+    $("#profileName").textContent = userName;
+    $("#avatar").textContent = userName.charAt(0).toUpperCase();
+  }
+
+  enterToSend = confirm(
+    "Press OK to enable Enter-to-send.\n\n" +
+    "When enabled, use Shift + Enter for a new line."
+  );
+});
+
+/* Help and feedback */
+$("#helpBtn").addEventListener("click", () => {
+  const choice = prompt(
+    "HELP & FEEDBACK\n\n" +
+    "1. Type a message and press Enter to send.\n" +
+    "2. Click a suggestion card to get started.\n" +
+    "3. Use + to create a new conversation.\n" +
+    "4. Use the theme button to switch appearance.\n" +
+    "5. Use the download button to export a chat.\n\n" +
+    "Enter feedback here, or leave blank to close:"
+  );
+
+  if (choice && choice.trim()) {
+    alert("Thank you for your feedback!");
+  }
+});
+
+/* Export current conversation */
+$("#exportBtn").addEventListener("click", () => {
+  const chat = currentChat();
+
+  if (!chat || !chat.messages.length) {
+    alert("Start a conversation before exporting.");
+    return;
+  }
+
+  const content = chat.messages.map(message =>
+    (message.sender === "user" ? userName : "My AI") +
+    ":\n" + message.text
+  ).join("\n\n");
+
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "my-ai-conversation.txt";
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+/* File selection — displays the selected filename */
+$("#attachBtn").addEventListener("click", () => {
+  $("#fileInput").click();
+});
+
+$("#fileInput").addEventListener("change", () => {
+  const file = $("#fileInput").files[0];
+
+  if (file) {
+    const promptBox = $("#prompt");
+    promptBox.value += (promptBox.value ? "\n" : "") +
+      "[Selected file: " + file.name + "]";
+    promptBox.dispatchEvent(new Event("input"));
+    promptBox.focus();
+  }
+});
+
+/* Voice input when browser supports speech recognition */
+$("#voiceBtn").addEventListener("click", () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Voice input is not supported in this browser. Try a supported browser.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+
+  recognition.onresult = event => {
+    const spokenText = event.results[0][0].transcript;
+    const promptBox = $("#prompt");
+
+    promptBox.value += (promptBox.value ? " " : "") + spokenText;
+    promptBox.dispatchEvent(new Event("input"));
+    promptBox.focus();
+  };
+
+  recognition.onerror = () => {
+    alert("Voice input could not start. Check your microphone permission.");
+  };
+
+  recognition.start();
+});
+
+/* Initial screen */
+renderHistory();
+</script>
+</body>
+</html>
